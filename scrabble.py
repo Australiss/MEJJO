@@ -27,8 +27,7 @@ def quit_Game():
     pygame.quit()
     quit()
 
-def car(x, y):
-    gameDisplay.blit(carImg, (x, y))
+
 
 
 def text_objects(text, font):
