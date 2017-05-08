@@ -109,7 +109,7 @@ def game_mainmenu():
         button("PROFILE", 350, 480, 160, 40, green, bright_green, )#FUNCTION GOES HERE)
         button("QUIT", 350, 530, 160, 40, red, bright_red, "quit")
         pygame.display.update()
-        clock.tick(60)
+        clock.tick(20)
 
 
 def game_loop():
@@ -127,7 +127,7 @@ def game_loop():
         gameDisplay.fill(white)
 
         pygame.display.update()
-        clock.tick(60)
+        clock.tick(20)
 
 
 game_mainmenu()
