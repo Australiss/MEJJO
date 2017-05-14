@@ -1,0 +1,190 @@
+import pygame
+import enchant
+pygame.init()
+clock = pygame.time.Clock()
+clock.tick(30)
+display_width = 1000
+display_height = 645
+font_size = 100
+gameDisplay = pygame.display.set_mode((display_width, display_height))
+pygame.display.set_caption('MEJJO Scrabble')
+boardPic = pygame.image.load('gameBoard.png')
+small_font = pygame.font.SysFont("comicsansms", 25)
+med_font = pygame.font.SysFont("comicsansms", 50)
+large_font = pygame.font.SysFont("comicsansms", 80)
+
+
+def text_objects(text, color, size):
+    if size == "small":
+        text_surface = small_font.render(text, True, color)
+    elif size == "medium":
+        text_surface = med_font.render(text, True, color)
+    elif size == "large":
+        text_surface = large_font.render(text, True, color)
+    return text_surface, text_surface.get_rect()
+
+
+def message_to_screen(msg, color, y_displace=0, size="small"):
+    text_surf, text_rect = text_objects(msg, color, size)
+    text_rect.center = (display_width/2, display_height/2+y_displace)
+    gameDisplay.blit(text_surf, text_rect)
+
+
+# colours
+black = (0,0,0)
+white = (255,255,255)
+red = (185,0,0)
+green = (0,200,0)
+blue = (0,0,255)
+bright_red = (255,0,0)
+bright_green =(0,255,0)
+fillColor = white
+
+# dictionary's
+dict_en = enchant.Dict("en_US")
+userDictionary = {}
+
+leaderDictionary = {'1st': " AAA  1000",
+                    '2nd': " BBB  900 ",
+                    '3rd': " CCC  800 ",
+                    '4th': " DDD  700 ",
+                    '5th': " EEE  600 ",
+                    '6th': " FFF  500 "}
+
+
+def search_dictionary():
+    search = input('Enter the word you want to search')
+    if dict_en.check(search):
+        print(search + " found in english dictionary")
+    else:
+        if search in userDictionary.keys():
+            print(search + " found in user added dictionary")
+        else:
+            print(search + " not found")
+
+
+def add_word():
+    word = input("Enter the word that you wont to add")
+    if dict_en.check(word):
+        print(word + " already in english dictionary")
+    else:
+        if word in userDictionary.keys():
+            print(word + " already in user added dictionary")
+        else:
+            userDictionary.update({word: word})
+            print(word+" added to user dictionary")
+
+
+def dictionary_menu():
+    dictionary_exit = False
+    while not dictionary_exit:
+        gameDisplay.fill(fillColor)
+        message_to_screen("DICTIONARY", red, -100, size="large")
+        message_to_screen("Press (s) to search for a word", red, +40)
+        message_to_screen("Press (a) to add a word to dictionary", red, +80)
+        message_to_screen("Press (m) to go to main menu", red, +120)
+        message_to_screen("Press (q) to quit", red, +160)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+                    dictionary_exit = True
+                elif event.key == pygame.K_q:
+                    dictionary_exit = True
+                elif event.key == pygame.K_a:
+                    add_word()
+                elif event.key == pygame.K_s:
+                    search_dictionary()
+        pygame.display.update()
+
+
+def leader_board_menu():
+    dictionary_exit = False
+    while not dictionary_exit:
+        gameDisplay.fill(fillColor)
+        message_to_screen("LEADER BOARD", red, -150, size="large")
+        message_to_screen("1st " + leaderDictionary["1st"], red, +40)
+        message_to_screen("2nd " + leaderDictionary["2nd"], red, +80)
+        message_to_screen("3rd " + leaderDictionary["3rd"], red, +120)
+        message_to_screen("4th " + leaderDictionary["4th"], red, +160)
+        message_to_screen("5th " + leaderDictionary["5th"], red, +200)
+        message_to_screen("6th " + leaderDictionary["6th"], red, +240)
+        message_to_screen("press (m) for main menu", red, +300)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+                    dictionary_exit = True
+        pygame.display.update()
+
+
+def play_game():
+    play_exit = False
+    # Sets width and height
+    tile_width = 40
+    tile_height = 40
+    grid = []
+    # Sets the margin between each cell
+    margin = 3
+    gameDisplay.fill(white)
+    gameDisplay.blit(boardPic, (0, 0))
+    # message_to_screen("Press (d) for dictionary", red, +80)
+    pygame.display.update()
+    for row in range(15):
+        # Add an empty array that will hold each cell
+        # in this row
+        grid.append([])
+        for column in range(15):
+            grid[row].append(0)  # Append a cell
+    while not play_exit:
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+                    play_exit = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # User clicks the mouse. Get the position
+                pos = pygame.mouse.get_pos()
+                # Change the x/y screen coordinates to grid coordinates
+                column = pos[0] // (tile_width + margin)
+                row = pos[1] // (tile_height + margin)
+                # Set that location to one
+                print("Click ", pos, "Grid coordinates: ", row, column)
+
+
+# Main game loop
+gameExit = False
+while not gameExit:
+    # Event section of loop
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            gameExit = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_d:
+                # Running the dictionary loop
+                dictionary_menu()
+            elif event.key == pygame.K_p:
+                play_game()
+            elif event.key == pygame.K_q:
+                gameExit = True
+            elif event.key == pygame.K_l:
+                leader_board_menu()
+
+    gameDisplay.fill(fillColor)
+    message_to_screen("MEJJO SCRABBLE", red, -100, size="large")
+    message_to_screen("Press (p) to play", red, +40)
+    message_to_screen("Press (d) for dictionary", red, +80)
+    message_to_screen("Press (l) for Leader board", red, +120)
+    message_to_screen("Press (q) to quit", red, +160)
+    pygame.display.update()
+
+
+pygame.quit()
+quit()
